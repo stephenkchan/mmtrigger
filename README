@@ -1,0 +1,29 @@
+Micromegas Trigger Simulation--ROOT based version
+
+Last update: Stephen Chan 24 March 2015, schan@cern.ch
+
+This code is based on Brian Clark's algorithm in MATLAB described in ATL-UPGRADE-INT-2014-001 and mimics said code in form and function, with updates to perform more as the actual algorithm will perform on an FPGA.
+
+Parts of their code and their responsibilities; these are all C++ clases that use ROOT libraries (was done on ROOT 5.34/00):
+
+MMT_struct: Defines all of the data structures used in the code.  The important ones are hdst_key (timing info) and hdst_info (the hit info (plane, strip, station)-->(y,z,slope)), and MMT_Parameters, which stores the geometry of the wedge and calculates all constants/look up tables used in the algorithm.  
+MMT_Loader: Takes hits from the ntuple and feeds them into the algorithm.  Also, mimics VMM deadtime.  Will store hits (stored as hdst_entry's, which have an hdst_key and hdst_entry, as well as some legacy information)
+MMT_Finder: Takes hits loaded in from MMT_Loader and puts them into slope roads.  It is derived from MMT_Fitter.
+MMT_Fitter: Does track fitting, calculates local and global slopes, theta, phi, Delta theta
+MM_Trigger: Weaves everything together.  It is derived from MMT_Loader and has a member MMT_Finder.
+
+How to use:
+See the sample script assay.C
+    It handles class compilation and will run over an ntuple (that David Lopez Mateos produces).  Its output will be a .root file with error resolution distributions in theta, phi, and Delta theta in bins (how many is a configurable parameter) of eta_truth (etaPosition), as well as histograms with fitted theta, phi, and Delta theta values and a theta_entry-theta_position histogram.  There is also capability for a variety of diagnostic histograms.
+    If you wish to do misalignments/misalignment corrections, MMT_Parameters can be built from a struct called par_par, which has two member struct's of type std_align, which have translations and rotations on the three local coordinate axes.
+    A sample ntuple has been included in the ntuple directory.  This file runs on the old geometry, for which everything is more or less known.  The geometry in release 20 is less clear.
+
+
+For vectors of vectors--this can be root version dependent for implementation; if you get issues about "newvectdict*pcm" do:
+% rootcint -f newvecdic.cxx -c gen_vd.h
+and recompile
+
+SOME NOTES ON CURRENT CONFIGURATION:
+--Sorry, everything is a little bit of a mess right now.  The algorithm requires atlasstyle-00-03-05 to compile because of some diagnostic histograms used to aid in figuring out what the new geometry in relase 20 is.  Just toggle off the debug (a global variable defined in MMT_struct.h) and diag (a member of MMT_Parameters).  Most of these don't need to be printed, but the event displays (MMT_Loader::print_event()) are done while the algorithm runs.  AtlasStyle must be downloaded (you can get a tarball from the twiki; just Google it), unpacked, and put somewhere accessible if you want to use the algorithm "out of the box."
+--MMT_Parameters is technically a class (I called it a class because it has lots of member functions and is more than a data bucket, which is how I think of struct's), but all the data members are public.  Sorry.  This shouldn't be too much of an issue since its almost entirely internal.
+--As the above remarks suggest, only the geometry for the old release is figured out (use a par_par standard to get the nominal geometry).  The release 20 stuff is buggy, but we're pretty sure it's jsut geometry (par_par dlm).
