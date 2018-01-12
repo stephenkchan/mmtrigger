@@ -2,7 +2,7 @@ Micromegas Trigger Simulation--ROOT based version
 
 Last update: Stephen Chan 24 March 2015, schan@cern.ch
 
-This code is based on Brian Clark's algorithm in MATLAB described in ATL-UPGRADE-INT-2014-001 and mimics said code in form and function, with updates to perform more as the actual algorithm will perform on an FPGA.
+This code is based on Brian Clark's algorithm in MATLAB described in ATL-UPGRADE-INT-2014-001 and mimics said code in form and function, with updates to perform more as the actual algorithm will perform on an FPGA.  The code has since been folded into the ATLAS Athena simulation and used as a basis for the Harard MMTP cosmic ray test stand.  It is kept in its simulation-based state as a point of reference.
 
 Parts of their code and their responsibilities; these are all C++ clases that use ROOT libraries (was done on ROOT 5.34/00):
 
@@ -24,6 +24,6 @@ For vectors of vectors--this can be root version dependent for implementation; i
 and recompile
 
 SOME NOTES ON CURRENT CONFIGURATION:
---Sorry, everything is a little bit of a mess right now.  The algorithm requires atlasstyle-00-03-05 to compile because of some diagnostic histograms used to aid in figuring out what the new geometry in relase 20 is.  Just toggle off the debug (a global variable defined in MMT_struct.h) and diag (a member of MMT_Parameters).  Most of these don't need to be printed, but the event displays (MMT_Loader::print_event()) are done while the algorithm runs.  AtlasStyle must be downloaded (you can get a tarball from the twiki; just Google it), unpacked, and put somewhere accessible if you want to use the algorithm "out of the box."
+--The algorithm requires atlasstyle-00-03-05 to compile because of some diagnostic histograms used to aid in figuring out what the new geometry in relase 20 is.  Just toggle off the debug (a global variable defined in MMT_struct.h) and diag (a member of MMT_Parameters).  Most of these don't need to be printed, but the event displays (MMT_Loader::print_event()) are done while the algorithm runs.  AtlasStyle must be downloaded (you can get a tarball from the twiki; just Google it), unpacked, and put somewhere accessible if you want to use the algorithm "out of the box."
 --MMT_Parameters is technically a class (I called it a class because it has lots of member functions and is more than a data bucket, which is how I think of struct's), but all the data members are public.  Sorry.  This shouldn't be too much of an issue since its almost entirely internal.
---As the above remarks suggest, only the geometry for the old release is figured out (use a par_par standard to get the nominal geometry).  The release 20 stuff is buggy, but we're pretty sure it's jsut geometry (par_par dlm).
+--As the above remarks suggest, only the geometry for the old release is figured out (use a par_par standard to get the nominal geometry).  The release 20 stuff is buggy, but we're pretty sure it's just geometry (par_par dlm).
